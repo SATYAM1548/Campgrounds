@@ -18,12 +18,13 @@ const mongoSanitize = require('express-mongo-sanitize');
 const userRoutes = require('./routes/user')
 const campgroundRoutes = require('./routes/campgrounds')
 const reviewRoutes = require('./routes/reviews');
-const { isLoggedIn, isReviewAuthor } = require('./middleware');
-const Campground = require('./models/campground');
-const catchAsync = require('./utilis/catchAsync');
-const helmet = require("helmet");
 
-mongoose.connect('mongodb://localhost:27017/yelp-camp', {
+const helmet = require("helmet");
+const MongoStore = require('connect-mongo');
+
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp'
+
+mongoose.connect(dbUrl, {
     useNewUrlParser: true,
 });
 
@@ -44,9 +45,25 @@ app.use(
     }),
 );
 
+
+const secret = process.env.SECRET || "thisshouldbeabettersecret";
+
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    crypto: {
+        secret
+    },
+    touchAfter: 24 * 60 * 60
+})
+
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR", e)
+})
+
 const sessionconfig = {
+    store,
     name: 'session',
-    secret: "thisshouldbeabettersecret",
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -128,13 +145,6 @@ app.use('/', userRoutes)
 app.use('/campgrounds', campgroundRoutes)
 app.use('/campgrounds/:id/reviews', reviewRoutes)
 
-// app.delete('/campgrounds/:id/reviews/reviewId', isLoggedIn, isReviewAuthor, catchAsync(async (req, res) => {
-//     const { id, reviewId } = req.params;
-//     await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-//     await Review.findByIdAndDelete(reviewId);
-//     req.flash('success', 'Successfully deleted review')
-//     res.redirect(`/campgrounds/${id}`);
-// }))
 
 app.engine('ejs', ejsMate)
 app.set('views', path.join(__dirname, 'views'));
