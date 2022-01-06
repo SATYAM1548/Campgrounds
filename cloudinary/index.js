@@ -14,6 +14,14 @@ const storage = new CloudinaryStorage({
         allowedFormats: ['jpeg', 'png', 'jpg']
     }
 });
+const signUpload = async () => {
+    const timestamp = Math.round(newDate() / 1000);
+    const params = {
+        timestamp: timestamp
+    };
+    const signature = await cloudinary.utils.api_sign_request(params, process.env.CLOUDINARY_SECRET);
+    return { timestamp, signature };
+}
 
 module.exports = {
     cloudinary,
