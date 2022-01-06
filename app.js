@@ -26,6 +26,7 @@ const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-camp'
 
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
+    useUnifiedTopology: true
 });
 
 const db = mongoose.connection;
@@ -164,9 +165,10 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('error', { err });
 })
 
+port = process.env.PORT || 6969;
 
-app.listen(5000, () => {
-    console.log('listening on port 5000');
+app.listen(port, () => {
+    console.log(`listening on port ${port}`);
 })
 
 
