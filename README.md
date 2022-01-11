@@ -25,8 +25,8 @@ Tools and technologies that i learnt and used in the project.
 ## Features Implemented so far
 * FULL CRUD (campgrounds and reviews)
 * MAPBOX FOR LOCATION 
-    *general campground 
-    *particular campground
+    **general campground 
+    **particular campground
 * REVIEWS
 * Local Authentication
 
